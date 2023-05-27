@@ -1,5 +1,6 @@
 const axios = require('axios');
 
+
 module.exports = {
   getQuestions(req, res) {
     const endpoint = 'https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/qa/questions';
