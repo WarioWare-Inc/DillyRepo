@@ -3,33 +3,24 @@ const db = require('../models/reviews');
 
 module.exports = {
   getReviews(req, res) {
-    db.getReviews(req.product_id, (err, result) => {
+    db.getReviews({ product_id: req.query.product_id, review_id: req.query.review_id }, (err, result) => {
       if (err) {
-        res.status(500).send('ERROR IN NEW GETTING OF REVIEWS: ', err);
+        res.status(400).send('ERROR IN NEW GETTING OF REVIEWS: ', err);
       }
-      res.status(200).json(result);
+      // console.log('HERE!: ', result.rows);
+      res.status(200).send(result.rows);
     });
   },
 
-  // getReviewsMeta(req, res) {
-  //   const endpoint = 'https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/reviews/meta';
-  //   const option = {
-  //     method: 'GET',
-  //     url: endpoint,
-  //     headers: {
-  //       Authorization: process.env.AUTH,
-  //     },
-  //     params: req.query,
-  //   };
-  //   return axios(option)
-  //     .then((result) => {
-  //       res.status(200).send(result.data);
-  //     })
-  //     .catch(() => {
-  //       console.log('Fail to send GET request for metadata');
-  //       res.status(400).send();
-  //     });
-  // },
+  getReviewsMeta(req, res) {
+    db.getReviewsMeta({ product_id: req.query.product_id }, (err, result) => {
+      if (err) {
+        res.status(400).send('ERROR IN NEW GETTING OF REVIEWS META: ', err);
+      }
+      // console.log('HERE!: ', result.rows);
+      res.status(200).send(result.rows[0]);
+    });
+  },
 
   // addReview(req, res) {
   //   const endpoint = 'https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/reviews';
@@ -71,3 +62,9 @@ module.exports = {
   // },
 
 };
+// module.exports.getReviews({ product_id: 1, review_id: 5774954 }, (err, result) => {
+//   if (err) {
+//     console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
+//   }
+//   console.log(result);
+// });

@@ -31,65 +31,118 @@ const getReviews = (params, cb) => {
             FROM images WHERE images.review_id = $2
           ) AS photos_data
         ) AS photos
-        FROM reviews WHERE reviews.product_id = $1
+        FROM reviews WHERE reviews.product_id = $1 AND reviews.reported = false
       ) AS results_data
     ) AS results
     FROM reviews WHERE product_id = $1`, [params.product_id, params.review_id], (err, result) => {
     if (err) {
       cb(err, null);
     }
-    console.log(result.rows[0].results[0])
+    // console.log(result.rows[0].results[0])
     cb(null, result);
   });
 };
 // TODO: Find the ratings and add them
 const getReviewsMeta = (params, cb) => {
-  client.query(`SELECT
+  client.query(`SELECT DISTINCT ON (reviews.product_id)
+  reviews.product_id,
+  (
+    SELECT json_object_agg(rating, ratings.number) FROM (
+      (
+        SELECT rating,
+        COUNT(rating) AS number FROM reviews WHERE reviews.product_id = $1 GROUP BY rating
+      )
+    ) AS ratings
+  ) AS ratings,
+
+  (
+    SELECT json_object_agg(recommend, recommended.number) FROM (
+      (
+        SELECT recommend,
+        COUNT(recommend) AS number FROM reviews WHERE reviews.product_id = $1 GROUP BY recommend
+      )
+    ) AS recommended
+  ) AS recommended,
+
+  (
+    SELECT json_object_agg(
+      characteristic_id, json_build_object(
+        'id', characteristic_reviews.characteristic_id,
+        'value', characteristic_reviews.value
+      )
+    ) FROM characteristic_reviews WHERE review_id = $1
+  ) AS characteristics
+
+FROM reviews WHERE product_id = $1;`, [params.product_id], (err, result) => {
+
+      /*
+      SELECT DISTINCT ON (reviews.product_id)
       reviews.product_id,
       (
-        SELECT json_object_agg(rating, ratings) FROM (
+        SELECT json_object_agg(rating, ratings.number) FROM (
           (
-          SELECT
-            COUNT(case when reviews.product_id = $1 AND reviews.rating = 1 then 1 else null end)
-            AS "1",
-            COUNT(case when reviews.product_id = $1 AND reviews.rating = 2 then 1 else null end)
-            AS "2",
-            COUNT(case when reviews.product_id = $1 AND reviews.rating = 3 then 1 else null end)
-            AS "3",
-            COUNT(case when reviews.product_id = $1 AND reviews.rating = 4 then 1 else null end)
-            AS "4",
-            COUNT(case when reviews.product_id = $1 AND reviews.rating = 5 then 1 else null end)
-            AS "5"
-            FROM reviews
+            SELECT rating,
+            COUNT(rating) AS number FROM reviews WHERE reviews.product_id = 1 GROUP BY rating
           )
         ) AS ratings
-      ) AS ratings
-    FROM reviews WHERE product_id = $1`, [params.product_id], (err, result) => {
+      ) AS ratings,
+
+      (
+        SELECT json_object_agg(recommend, recommended.number) FROM (
+          (
+            SELECT recommend,
+            COUNT(recommend) AS number FROM reviews WHERE reviews.product_id = 1123 GROUP BY recommend
+          )
+        ) AS recommended
+      ) AS recommended,
+
+      (
+        SELECT json_object_agg(
+          characteristic_id, json_build_object(
+            'id', characteristic_reviews.characteristic_id,
+            'value', characteristic_reviews.value
+          )
+        ) FROM characteristic_reviews WHERE review_id = 1123
+      ) AS characteristics
+
+    FROM reviews WHERE product_id = 1123;
+
+
+
+
+      */
     if (err) {
       cb(err, null);
     }
-    // console.log('HERE:   ', result.rows);
-    // console.log('HERE:   ', result.rows[1].ratings);
+    const queryResults = {
+      product_id: result.rows[0].product_id,
+      ratings: result.rows[0].ratings
+    };
+    console.log('HERE:   ', result.rows[0]);
     cb(null, result);
   });
 };
 
-const getImages = (params, cb) => {
-  client.query('SELECT * FROM images WHERE product_id = $1', [params.product_id], (err, result) => {
-    if (err) {
-      cb(err, null);
-    }
-    cb(null, result);
-  });
+const getCharacteristicsMeta = (params, cb) => {
+
 };
+
+// const getImages = (params, cb) => {
+//   client.query('SELECT * FROM images WHERE product_id = $1', [params.product_id], (err, result) => {
+//     if (err) {
+//       cb(err, null);
+//     }
+//     cb(null, result);
+//   });
+// };
 
 module.exports = {
   getReviews,
   getReviewsMeta,
-  getImages,
+  // getImages,
 };
 
-getReviewsMeta({ product_id: 1, review_id: 5774954 }, (err, result) => {
+module.exports.getReviewsMeta({ product_id: 1234 }, (err, result) => {
   if (err) {
     console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
   }

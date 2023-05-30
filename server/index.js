@@ -27,7 +27,7 @@ app.use(logger);
 // Set up our routes
 
 // product
-app.get('/products', controller.product.getProducts);
+// app.get('/products', controller.product.getProducts);
 // app.get('/products/:productId', controller.product.getProduct);
 // app.get('/products/:productId/styles', controller.product.getProductStyle);
 // app.get('/products/:productId/related', controller.product.getRelated);
@@ -37,7 +37,7 @@ app.get('/products', controller.product.getProducts);
 // reviews
 /** ******* */
 app.get('/reviews', controller.reviews.getReviews);
-// app.get('/reviews/meta', controller.reviews.getReviewsMeta);
+app.get('/reviews/meta', controller.reviews.getReviewsMeta);
 // app.post('/reviews', controller.reviews.addReview);
 // app.put('/reviews/helpful', controller.reviews.markHelpful);
 
