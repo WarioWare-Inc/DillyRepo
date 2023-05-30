@@ -62,9 +62,9 @@ module.exports = {
   // },
 
 };
-// module.exports.getReviews({ product_id: 1, review_id: 5774954 }, (err, result) => {
-//   if (err) {
-//     console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
-//   }
-//   console.log(result);
-// });
+module.exports.getReviews({ query: { product_id: 1, review_id: 5774954 } }, (err, result) => {
+  if (err) {
+    console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
+  }
+  console.log(result);
+});

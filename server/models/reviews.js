@@ -74,67 +74,13 @@ const getReviewsMeta = (params, cb) => {
   ) AS characteristics
 
 FROM reviews WHERE product_id = $1;`, [params.product_id], (err, result) => {
-
-      /*
-      SELECT DISTINCT ON (reviews.product_id)
-      reviews.product_id,
-      (
-        SELECT json_object_agg(rating, ratings.number) FROM (
-          (
-            SELECT rating,
-            COUNT(rating) AS number FROM reviews WHERE reviews.product_id = 1 GROUP BY rating
-          )
-        ) AS ratings
-      ) AS ratings,
-
-      (
-        SELECT json_object_agg(recommend, recommended.number) FROM (
-          (
-            SELECT recommend,
-            COUNT(recommend) AS number FROM reviews WHERE reviews.product_id = 1123 GROUP BY recommend
-          )
-        ) AS recommended
-      ) AS recommended,
-
-      (
-        SELECT json_object_agg(
-          characteristic_id, json_build_object(
-            'id', characteristic_reviews.characteristic_id,
-            'value', characteristic_reviews.value
-          )
-        ) FROM characteristic_reviews WHERE review_id = 1123
-      ) AS characteristics
-
-    FROM reviews WHERE product_id = 1123;
-
-
-
-
-      */
     if (err) {
       cb(err, null);
     }
-    const queryResults = {
-      product_id: result.rows[0].product_id,
-      ratings: result.rows[0].ratings
-    };
-    console.log('HERE:   ', result.rows[0]);
+
     cb(null, result);
   });
 };
-
-const getCharacteristicsMeta = (params, cb) => {
-
-};
-
-// const getImages = (params, cb) => {
-//   client.query('SELECT * FROM images WHERE product_id = $1', [params.product_id], (err, result) => {
-//     if (err) {
-//       cb(err, null);
-//     }
-//     cb(null, result);
-//   });
-// };
 
 module.exports = {
   getReviews,
@@ -142,9 +88,9 @@ module.exports = {
   // getImages,
 };
 
-module.exports.getReviewsMeta({ product_id: 1234 }, (err, result) => {
-  if (err) {
-    console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
-  }
-  console.log(result);
-});
+// module.exports.getReviewsMeta({ product_id: 1234 }, (err, result) => {
+//   if (err) {
+//     console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
+//   }
+//   console.log(result);
+// });
