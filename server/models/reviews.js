@@ -1,11 +1,15 @@
+require('dotenv').config();
 const { Client } = require('pg');
 
 const client = new Client({
-  database: 'postgres',
-  port: '5432',
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
-
 client.connect();
+
 // TODO: CONVERT PRODUCTID TO STRING
 //       UN-HARDCODE THE DATA
 const getReviews = (params, cb) => {
@@ -94,3 +98,71 @@ module.exports = {
 //   }
 //   console.log(result);
 // });
+
+/*
+
+SELECT
+    reviews.product_id AS product,
+    (
+      SELECT json_agg(results_data) FROM (
+        SELECT
+        id AS review_id,
+        rating,
+        summary,
+        recommend,
+        response,
+        body,
+        date,
+        reviewer_name,
+        helpfullness,
+        (
+          SELECT json_agg(photos_data) FROM (
+            SELECT
+            id,
+            url
+            FROM images WHERE images.review_id = 1000009
+          ) AS photos_data
+        ) AS photos
+        FROM reviews WHERE reviews.product_id = 1000009 AND reviews.reported = false
+      ) AS results_data
+    ) AS results
+    FROM reviews WHERE product_id = 1000009
+
+
+
+
+
+
+
+SELECT DISTINCT ON (reviews.product_id)
+  reviews.product_id,
+  (
+    SELECT json_object_agg(rating, ratings.number) FROM (
+      (
+        SELECT rating,
+        COUNT(rating) AS number FROM reviews WHERE reviews.product_id = 642342 GROUP BY rating
+      )
+    ) AS ratings
+  ) AS ratings,
+
+  (
+    SELECT json_object_agg(recommend, recommended.number) FROM (
+      (
+        SELECT recommend,
+        COUNT(recommend) AS number FROM reviews WHERE reviews.product_id = 642342 GROUP BY recommend
+      )
+    ) AS recommended
+  ) AS recommended,
+
+  (
+    SELECT json_object_agg(
+      characteristic_id, json_build_object(
+        'id', characteristic_reviews.characteristic_id,
+        'value', characteristic_reviews.value
+      )
+    ) FROM characteristic_reviews WHERE review_id = 642342
+  ) AS characteristics
+
+FROM reviews WHERE product_id = 642342;
+
+*/

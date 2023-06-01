@@ -3,6 +3,7 @@ const db = require('../models/reviews');
 
 module.exports = {
   getReviews(req, res) {
+    // console.log(res);
     db.getReviews({ product_id: req.query.product_id, review_id: req.query.review_id }, (err, result) => {
       if (err) {
         res.status(400).send('ERROR IN NEW GETTING OF REVIEWS: ', err);
@@ -62,9 +63,9 @@ module.exports = {
   // },
 
 };
-module.exports.getReviews({ query: { product_id: 1, review_id: 5774954 } }, (err, result) => {
-  if (err) {
-    console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
-  }
-  console.log(result);
-});
+// module.exports.getReviews({ query: { product_id: 1, review_id: 5774954 } }, (err, result) => {
+//   if (err) {
+//     console.error('ERROR IN NEW GETTING OF REVIEWS: ', err);
+//   }
+//   console.log(result);
+// });
